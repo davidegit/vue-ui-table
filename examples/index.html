@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <title>vue-ui-table examples</title>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+        <script src="../dist/vue-ui-table.umd.js"></script>
+        <link rel="stylesheet" href="../dist/vue-ui-table.css">
+    </head>
+    <body>
+        <div id="examples">
+            <ui-table :items="items" :pagination="pagination" ref="table">
+                <ui-table-column prop="a" header="A" width="100"></ui-table-column>
+                <ui-table-column prop="b" header="B"></ui-table-column>
+            </ui-table>
+        </div>
+    </body>
+    <script lang="application/javascript">
+        const examples = new Vue({
+            el: "#examples",
+            data() {
+                return {
+                    items: [
+                        { a: 1, b: 2 },
+                        { a: 1, b: 2 },
+                        { a: 1, b: 2 },
+                        { a: 1, b: 2 },
+                        { a: 1, b: 2 },
+                        { a: 1, b: 2 }
+                    ],
+                    pagination: {
+                        page: 1,
+                        max: 20
+                    }
+                }
+            }
+        })
+    </script>
+</html>

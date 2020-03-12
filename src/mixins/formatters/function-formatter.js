@@ -1,3 +1,4 @@
+import { isArray } from "lodash"
 import arrayFormatter from "./array-formatter"
 
 export default {
@@ -7,11 +8,11 @@ export default {
     },
     methods: {
         translate(value) {
-            if(this._.isArray(value)) return this.arrayFormat(value, this.format)
+            if(isArray(value)) return this.arrayFormat(value, this.format)
             else return this.format(value)
         },
         async asyncTranslate(value) {
-            if(this._.isArray(value)) return await this.asyncArrayFormat(value, this.format)
+            if(isArray(value)) return await this.asyncArrayFormat(value, this.format)
             else return await this.format(value)
         }
     }

@@ -31,6 +31,7 @@
 </template>
 
 <script>
+import * as _ from "lodash"
 import UiTableHeader from "./ui-table-header"
 import UiTableCell from "./ui-table-cell"
 
@@ -62,16 +63,16 @@ export default {
         }
     },
     computed: {
-        tableId() { return this._.uniqueId("ui-table-") },
-        hasCaption() { return !this._.isNil(this.caption) || !this._.isNil(this.$slots.caption) },
+        tableId() { return _.uniqueId("ui-table-") },
+        hasCaption() { return !_.isNil(this.caption) || !_.isNil(this.$slots.caption) },
         paginationEnabled() {
-            if(this._.isBoolean(this.pagination)) return !this.hideFooter && this.pagination
-            else return !this.hideFooter && !this._.isEmpty(this.pagination)
+            if(_.isBoolean(this.pagination)) return !this.hideFooter && this.pagination
+            else return !this.hideFooter && !_.isEmpty(this.pagination)
         },
         pagedItems() { return this.items },
-        rows() { return this._.map(this.pagedItems, (item, index) => ({ item, itemKey: this.getItemKey(item, index) })) },
-        fixedLayout() { return !this._.chain(this.columns).find(column => !!column.columnWidth).isNil().value() },
-        selectable() { return !this._.isNil(this.$listeners.change) },
+        rows() { return _.map(this.pagedItems, (item, index) => ({ item, itemKey: this.getItemKey(item, index) })) },
+        fixedLayout() { return !_.chain(this.columns).find(column => !!column.columnWidth).isNil().value() },
+        selectable() { return !_.isNil(this.$listeners.change) },
         classes() {
             return {
                 bordered: this.bordered && !this.borderless,
@@ -84,8 +85,8 @@ export default {
     },
     methods: {
         getItemKey(item, index) {
-            if(this._.isString(this.itemKey) && this._.isPlainObject(item)) return this._.get(item, this.itemKey)
-            if(this._.isFunction(this.itemKey)) return this.itemKey(item)
+            if(_.isString(this.itemKey) && _.isPlainObject(item)) return _.get(item, this.itemKey)
+            if(_.isFunction(this.itemKey)) return this.itemKey(item)
             return index
         },
         getColumnIndex(column) { return [].indexOf.call(this.$refs.columns.children, column.$el) },

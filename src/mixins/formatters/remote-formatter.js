@@ -1,3 +1,4 @@
+import * as _ from "lodash"
 import arrayFormatter from "./array-formatter"
 import apiMixin from "@/mixins/api-mixin"
 
@@ -14,7 +15,7 @@ export default {
     },
     methods: {
         getFormatApiConfig(value) {
-            if(this._.isFunction(this.formatApi)) return this.getApiConfig(this.formatApi(value))
+            if(_.isFunction(this.formatApi)) return this.getApiConfig(this.formatApi(value))
             else return this.getApiConfig(this.formatApi)
         },
         async remoteFormat(value) {
@@ -22,14 +23,14 @@ export default {
                 this.formatting = true
                 const response = await this.axios.reques(this.getFormatApiConfig(value))
                 const data = response.data
-                if(this._.isString(data)) return data
-                if(this._.isString(this.itemFormat) && this._.isPlainObject(data)) return this._.get(data, this.itemFormat, "")
-                if(this._.isFunction(this.itemFormat)) return this.itemFormat(dara)
+                if(_.isString(data)) return data
+                if(_.isString(this.itemFormat) && _.isPlainObject(data)) return _.get(data, this.itemFormat, "")
+                if(_.isFunction(this.itemFormat)) return this.itemFormat(dara)
                 return data
             } finally { this.formatting = false }
         },
         async remoteTranslate(value) {
-            if(this._.isArray(value)) return await this.asyncArrayFormat(value, this.remoteFormat)
+            if(_.isArray(value)) return await this.asyncArrayFormat(value, this.remoteFormat)
             else return await this.remoteFormat(value)
         }
     }

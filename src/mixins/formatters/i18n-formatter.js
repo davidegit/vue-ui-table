@@ -1,3 +1,4 @@
+import { isArray } from "lodash"
 import arrayFormatter from "./array-formatter"
 
 export default {
@@ -8,7 +9,7 @@ export default {
     methods: {
         i18nFormat(value) { return this.$t(`${this.i18nPrefix}.${value}`) },
         i18nTranslate(value) {
-            if(this._.isArray(value)) return this.arrayFormat(value, this.i18nFormat)
+            if(isArray(value)) return this.arrayFormat(value, this.i18nFormat)
             else return this.i18nFormat(value)
         }
     }

@@ -4,6 +4,7 @@
 
 <script>
 import { formattersFactory } from "@/mixins/formatters-mixin"
+import * as _ from "lodash"
 
 export default {
     name: "ui-table-column",
@@ -16,7 +17,7 @@ export default {
         width: [String, Number]
     },
     computed: {
-        columnId() { return this._.uniqueId("ui-table-column-") },
+        columnId() { return _.uniqueId("ui-table-column-") },
         uiTable() {
             let parent = this.$parent
             while (parent && !parent.tableId) parent = parent.$parent
@@ -24,9 +25,9 @@ export default {
         },
         sortOn() { return this.sortProp || this.prop },
         columnWidth() {
-            if(this._.isNumber(this.width)) return `${this.width}px`
-            else if(this._.isString(this.width)) {
-                if(this._.endsWith(this.width, "px")) return this.width
+            if(_.isNumber(this.width)) return `${this.width}px`
+            else if(_.isString(this.width)) {
+                if(_.endsWith(this.width, "px")) return this.width
                 return `${this.width}px`
             }
         }
@@ -34,7 +35,7 @@ export default {
     methods: {
         getValue(item) {
             let value = ""
-            if(!this._.isNil(this.prop) && this._.isPlainObject(item)) value = this._.get(item, this.prop)
+            if(!_.isNil(this.prop) && _.isPlainObject(item)) value = _.get(item, this.prop)
             return this.formatValue(value)
         },
         renderHeader() {
