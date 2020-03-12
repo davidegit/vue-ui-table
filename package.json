@@ -1,10 +1,14 @@
 {
-    "name": "vue-ui-table",
+    "name": "@davidegit/vue-ui-table",
     "version": "0.1.0",
     "description": "A flexible table component for Vue.js",
     "author": "Davide Vergine",
+    "homepage": "https://github.com/davidegit/vue-ui-table",
     "main": "dist/vue-ui-table.js",
-    "scripts": {},
+    "scripts": {
+        "build": "vue-cli-service build",
+        "build-lib": "vue-cli-service build --target lib --name vue-ui-table ./src/components/index.js"
+    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/davidegit/vue-ui-table.git"
@@ -20,7 +24,17 @@
     "license": "GPLv3",
     "devDependencies": {
         "vue": "^2.6.11",
-        "@fortawesome/fontawesome-free": "^5.12.1"
+        "@fortawesome/fontawesome-free": "^5.12.1",
+        "@vue/cli-plugin-babel": "~4.2.0",
+        "@vue/cli-plugin-router": "~4.2.0",
+        "@vue/cli-plugin-vuex": "~4.2.0",
+        "@vue/cli-service": "~4.2.0",
+        "vue-template-compiler": "^2.6.11",
+        "sass": "^1.25.0",
+        "sass-loader": "^8.0.2"
+    },
+    "optionalDependencies": {
+        "vue-i18n": "^8.0.0"
     },
     "peerDependencies": {
         "vue": "^2.6.11"
