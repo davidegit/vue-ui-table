@@ -7,7 +7,7 @@ const VueUiTablePlugin = {
         console.debug("install vue-ui-table", options)
         setConfig(options)
         Object.defineProperty(Vue.prototype, "$uiTable", {
-            get() { return config } ,
+            get() { return Vue.observable(config) } ,
             set: setConfig
         })
         Vue.component(UiTable.name, UiTable)

@@ -1,3 +1,4 @@
+import Vue from "vue"
 import * as _ from "lodash"
 
 const config = {
@@ -22,8 +23,9 @@ const config = {
 
 export function setConfig(options) {
     if(!_.isNil(options) && _.isPlainObject(options) && !_.isEmpty(options)) {
-        if(!_.isNil(options.icons) && _.isPlainObject(options.icons)) config.icons = Object.assign({}, config.icons, options.icons)
-        if(!_.isNil(options.theme) && _.isPlainObject(options.theme)) config.theme = Object.assign({}, config.theme, options.theme)
+        if(!_.isNil(options.icons) && _.isPlainObject(options.icons)) config.icons = _.merge({}, config.icons, options.icons)
+        if(!_.isNil(options.theme) && _.isPlainObject(options.theme)) config.theme = _.merge({}, config.theme, options.theme)
+        console.debug("vue-ui-table config updated", config)
     }
 }
 
