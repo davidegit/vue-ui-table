@@ -1,2 +1,7 @@
 node_modules
-dist
+/dist/
+.idea
+build-docs.sh
+/src/main.js
+/src/docs/
+/public/

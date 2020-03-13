@@ -3,17 +3,18 @@
     "version": "0.1.2",
     "description": "A flexible table component for Vue.js",
     "author": "Davide Vergine",
-    "homepage": "https://github.com/davidegit/vue-ui-table",
+    "homepage": "https://github.com/davidegit/vue-ui-table/index.html",
     "private": false,
     "main": "dist/vue-ui-table.common.js",
     "files": [
         "dist/*"
     ],
-    "publishConfig": { "registry": "https://npm.pkg.github.com/" },
     "scripts": {
+        "serve": "vue-cli-service serve",
         "build": "vue-cli-service build",
-        "build-lib": "vue-cli-service build --target lib --name vue-ui-table ./src/components/index.js",
-        "publish": "npm run build-lib & npm publish --access=public"
+        "build-lib": "vue-cli-service build --target lib --name vue-ui-table src/vue-ui-template-plugin.js",
+        "publish": "sh ./publish.sh",
+        "docs": "sh ./build-docs.sh"
     },
     "repository": {
         "type": "git",
@@ -30,22 +31,26 @@
     "license": "GPLv3",
     "dependencies": {
         "@babel/polyfill": "^7.4.4",
-        "vue": "^2.6.11",
+        "@fortawesome/fontawesome-free": "^5.12.1",
+        "axios": "^0.19.2",
         "core-js": "^3.6.4",
         "lodash": "^4.17.15",
-        "axios": "^0.19.2",
-        "@fortawesome/fontawesome-free": "^5.12.1"
+        "vue": "^2.6.11"
     },
     "devDependencies": {
         "@vue/cli-plugin-babel": "~4.2.0",
         "@vue/cli-plugin-router": "~4.2.0",
-        "@vue/cli-plugin-vuex": "~4.2.0",
         "@vue/cli-service": "~4.2.0",
-        "vue-template-compiler": "^2.6.11",
+        "bulma": "^0.8.0",
         "sass": "^1.25.0",
-        "sass-loader": "^8.0.2"
+        "sass-loader": "^8.0.2",
+        "vue-router": "^3.1.6",
+        "vue-template-compiler": "^2.6.11"
     },
     "optionalDependencies": {
         "vue-i18n": "^8.0.0"
+    },
+    "peerDependencies": {
+        "vue": "^2.5.0"
     }
 }

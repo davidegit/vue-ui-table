@@ -1,19 +1,20 @@
 <template>
-    <table class="ui-table" :class="classes">
-        <colgroup ref="columns">
-            <slot/>
-        </colgroup>
-        <caption v-if="hasCaption">
-            <slot name="caption">{{caption}}</slot>
-        </caption>
-        <thead v-if="!hideHeaders">
+    <div :style="containerStyle" class="ui-table-container" :class="containerClasses">
+        <table :class="tableclasses">
+            <colgroup ref="columns">
+                <slot/>
+            </colgroup>
+            <caption v-if="hasCaption">
+                <slot name="caption">{{caption}}</slot>
+            </caption>
+            <thead v-if="!hideHeaders">
             <slot name="headers">
                 <tr>
                     <ui-table-header v-for="(column, columnIndex) in columns" :key="`ui-table-header-${columnIndex}`" :column="column"/>
                 </tr>
             </slot>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             <slot name="items">
                 <template v-for="(row, rowIndex) in rows">
                     <slot name="row" v-bind="row">
@@ -23,135 +24,116 @@
                     </slot>
                 </template>
             </slot>
-        </tbody>
-        <tfoot>
+            </tbody>
+            <tfoot>
 
-        </tfoot>
-    </table>
+            </tfoot>
+        </table>
+    </div>
 </template>
 
 <script>
-import * as _ from "lodash"
-import UiTableHeader from "./ui-table-header"
-import UiTableCell from "./ui-table-cell"
+    import pixelHelperMixin from "@/mixins/pixel-helper-mixin"
+    import htmlHelperMixin from "@/mixins/html-helper-mixin"
+    import * as _ from "lodash"
+    import UiTableHeader from "./ui-table-header"
+    import UiTableCell from "./ui-table-cell"
 
-export default {
-    name: "ui-table",
-    components: { UiTableHeader, UiTableCell },
-    model: {
-        prop: "selected",
-        event: "change"
-    },
-    props: {
-        caption: String,
-        hideHeaders: Boolean,
-        items: Array,
-        itemKey: [String, Function],
-        selected: { required: false },
-        multiple: Boolean,
-        hideFooter: Boolean,
-        pagination: [Boolean, Object],
-        bordered: Boolean,
-        striped: Boolean,
-        dense: Boolean,
-        hoverable: Boolean,
-        borderless: Boolean
-    },
-    data() {
-        return {
-            columns: []
-        }
-    },
-    computed: {
-        tableId() { return _.uniqueId("ui-table-") },
-        hasCaption() { return !_.isNil(this.caption) || !_.isNil(this.$slots.caption) },
-        paginationEnabled() {
-            if(_.isBoolean(this.pagination)) return !this.hideFooter && this.pagination
-            else return !this.hideFooter && !_.isEmpty(this.pagination)
+    export default {
+        name: "ui-table",
+        mixins: [pixelHelperMixin, htmlHelperMixin],
+        components: { UiTableHeader, UiTableCell },
+        model: {
+            prop: "selected",
+            event: "change"
         },
-        pagedItems() { return this.items },
-        rows() { return _.map(this.pagedItems, (item, index) => ({ item, itemKey: this.getItemKey(item, index) })) },
-        fixedLayout() { return !_.chain(this.columns).find(column => !!column.columnWidth).isNil().value() },
-        selectable() { return !_.isNil(this.$listeners.change) },
-        classes() {
+        props: {
+            caption: String,
+            hideHeaders: Boolean,
+            items: Array,
+            itemKey: [String, Function],
+            selected: { required: false },
+            multiple: Boolean,
+            hideFooter: Boolean,
+            pagination: [Boolean, Object],
+            bordered: Boolean,
+            striped: Boolean,
+            dense: Boolean,
+            hoverable: Boolean,
+            borderless: Boolean,
+            width: [String, Number],
+            maxWidth: [String, Number],
+            height: [String, Number],
+            maxHeight: [String, Number],
+            containerClass: [String, Array, Object],
+            tableClass: [String, Array, Object]
+        },
+        data() {
             return {
-                bordered: this.bordered && !this.borderless,
-                striped: this.striped,
-                dense: this.dense,
-                hoverable: this.selectable || this.hoverable,
-                borderless: this.borderless && !this.bordered
+                columns: []
             }
-        }
-    },
-    methods: {
-        getItemKey(item, index) {
-            if(_.isString(this.itemKey) && _.isPlainObject(item)) return _.get(item, this.itemKey)
-            if(_.isFunction(this.itemKey)) return this.itemKey(item)
-            return index
         },
-        getColumnIndex(column) { return [].indexOf.call(this.$refs.columns.children, column.$el) },
-        addColumn(column) {
-            const index = this.getColumnIndex(column)
-            column.columnIndex = index
-            console.debug("ui-table add column", column.columnId, "at index", index)
-            this.columns.splice(index, 0, column)
+        computed: {
+            tableId() { return _.uniqueId("ui-table-") },
+            hasCaption() { return !_.isNil(this.caption) || !_.isNil(this.$slots.caption) },
+            paginationEnabled() {
+                if(_.isBoolean(this.pagination)) return !this.hideFooter && this.pagination
+                else return !this.hideFooter && !_.isEmpty(this.pagination)
+            },
+            pagedItems() { return this.items },
+            rows() { return _.map(this.pagedItems, (item, index) => ({ item, itemKey: this.getItemKey(item, index) })) },
+            fixedLayout() { return !_.chain(this.columns).find(column => !!column.columnWidth).isNil().value() },
+            selectable() { return !_.isNil(this.$listeners.change) },
+            containerClasses() {
+                return {
+                    [this.$uiTable.theme.classes.container]: true,
+                    ...this.convertClassToObject(this.containerClass)
+                }
+            },
+            containerStyle() {
+                const width = this.convertToPixel(this.width)
+                const height = this.convertToPixel(this.height)
+                const maxWidth = this.convertToPixel(this.maxWidth)
+                const maxHeight = this.convertToPixel(this.maxHeight)
+                const style = {}
+                if(!_.isNil(width)) _.set(style, "width", width)
+                if(!_.isNil(height)) _.set(style, "height", height)
+                if(!_.isNil(maxWidth)) _.set(style, "maxWidth", maxWidth)
+                if(!_.isNil(maxHeight)) _.set(style, "maxHeight", maxHeight)
+                return style
+            },
+            tableclasses() {
+                return {
+                    [this.$uiTable.theme.classes.table]: true,
+                    [this.$uiTable.theme.classes.bordered]: this.bordered && !this.borderless,
+                    [this.$uiTable.theme.classes.striped]: this.striped,
+                    [this.$uiTable.theme.classes.dense]: this.dense,
+                    [this.$uiTable.theme.classes.hoverable]: this.selectable || this.hoverable,
+                    borderless: this.borderless && !this.bordered,
+                    ...this.convertClassToObject(this.tableClass)
+                }
+            }
         },
-        removeColumn(column) {
-            const index = column.columnIndex
-            if(index >= 0) {
-                console.debug("ui-table remove column", column.columnId, "at index", index)
-                this.columns.splice(index, 1)
-            }
-        }
-    }
-}
-</script>
-
-<style lang="scss">
-    $border-color: var(--v-primary-base);
-    $stripe-color: var(--v-secondary-darken1);
-    $hover-color: var(--v-secondary-base);
-
-    .ui-table {
-        width: 100%;
-        border-collapse: collapse;
-        &.striped tr:nth-child(even) { background-color: $stripe-color; }
-        &.bordered {
-            th, td {
-                border-top: solid 1px $border-color;
-                border-left: solid 1px $border-color;
-                border-right: solid 1px $border-color;
-            }
-        }
-        &.dense {
-            thead tr { height: unset; }
-            th, td { padding: 2px; }
-        }
-        &.hoverable tbody tr:hover { background-color: $hover-color; }
-        th, td {
-            padding: 8px;
-            &.fit, &[fit] {
-                white-space: nowrap;
-                width: 1%;
-            }
-            &.grow, &[grow] { width: 100%; }
-        }
-        &.borderless {
-            thead, tbody td { border-bottom: none; }
-        }
-        thead {
-            border-bottom: solid 2px $border-color;
-            tr {
-                height: 56px;
-                &.ui-table-progress {
-                    height: unset;
-                    th {
-                        height: unset;
-                        padding: 0;
-                    }
+        methods: {
+            getItemKey(item, index) {
+                if(_.isString(this.itemKey) && _.isPlainObject(item)) return _.get(item, this.itemKey)
+                if(_.isFunction(this.itemKey)) return this.itemKey(item)
+                return index
+            },
+            getColumnIndex(column) { return [].indexOf.call(this.$refs.columns.children, column.$el) },
+            addColumn(column) {
+                const index = this.getColumnIndex(column)
+                column.columnIndex = index
+                console.debug("ui-table add column", column.columnId, "at index", index)
+                this.columns.splice(index, 0, column)
+            },
+            removeColumn(column) {
+                const index = column.columnIndex
+                if(index >= 0) {
+                    console.debug("ui-table remove column", column.columnId, "at index", index)
+                    this.columns.splice(index, 1)
                 }
             }
         }
-        tbody td { border-bottom: solid 1px $border-color; }
     }
-</style>
+</script>

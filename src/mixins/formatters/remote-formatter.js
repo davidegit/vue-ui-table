@@ -25,7 +25,7 @@ export default {
                 const data = response.data
                 if(_.isString(data)) return data
                 if(_.isString(this.itemFormat) && _.isPlainObject(data)) return _.get(data, this.itemFormat, "")
-                if(_.isFunction(this.itemFormat)) return this.itemFormat(dara)
+                if(_.isFunction(this.itemFormat)) return this.itemFormat(data)
                 return data
             } finally { this.formatting = false }
         },

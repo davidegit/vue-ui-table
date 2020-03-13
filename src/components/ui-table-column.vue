@@ -4,17 +4,20 @@
 
 <script>
 import { formattersFactory } from "@/mixins/formatters-mixin"
+import pixelHelperMixin from "@/mixins/pixel-helper-mixin"
 import * as _ from "lodash"
 
 export default {
     name: "ui-table-column",
-    mixins: [formattersFactory(true, true)],
+    mixins: [formattersFactory(true, true), pixelHelperMixin],
     props: {
         header: String,
         prop: String,
         sortable: Boolean,
         sortProp: String,
-        width: [String, Number]
+        width: [String, Number],
+        headerClass: [String, Array, Object],
+        cellClass: [String, Array, Object, Function]
     },
     computed: {
         columnId() { return _.uniqueId("ui-table-column-") },
@@ -24,22 +27,24 @@ export default {
             return parent
         },
         sortOn() { return this.sortProp || this.prop },
-        columnWidth() {
-            if(_.isNumber(this.width)) return `${this.width}px`
-            else if(_.isString(this.width)) {
-                if(_.endsWith(this.width, "px")) return this.width
-                return `${this.width}px`
-            }
-        }
+        columnWidth() { return this.convertToPixel(this.width) }
     },
     methods: {
+        getHeaderClass() { return this.headerClass },
+        getCellClass(item) {
+            if(!_.isNil(this.cellClass)) {
+                if(_.isFunction(this.cellClass)) return this.cellClass(item)
+                return this.cellClass
+            }
+        },
         getValue(item) {
             let value = ""
             if(!_.isNil(this.prop) && _.isPlainObject(item)) value = _.get(item, this.prop)
             return this.formatValue(value)
         },
-        renderHeader() {
+        renderHeader(props) {
             if(!!this.$slots.header) return this.$slots.header
+            if(!!this.$scopedSlots.header) return this.$scopedSlots.header(props)
             return this.header
         },
         renderItem(item, itemKey) {
