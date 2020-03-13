@@ -1,2 +1,2 @@
 (window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["home"],{f595:function(e,t,n){"use strict";n.r(t);var s=function(){var e=this,t=e.$createElement;e._self._c;return e._m(0)},c=[function(){var e=this,t=e.$createElement,n=e._self._c||t;return n("section",{staticClass:"section"},[n("div",{staticClass:"content"},[n("h1",[e._v("vue-ui-table")]),n("p",[e._v("A flexible table component for Vue.js")])])])}],l={name:"home"},a=l,o=n("2877"),i=Object(o["a"])(a,s,c,!1,null,null,null);t["default"]=i.exports}}]);
-//# sourceMappingURL=home.314d3f6c.js.map
+//# sourceMappingURL=home.8e309042.js.map
