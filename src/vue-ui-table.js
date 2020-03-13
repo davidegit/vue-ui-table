@@ -2,7 +2,7 @@ import config, { setConfig } from "./config"
 import UiTable from "./components/ui-table"
 import UiTableColumn from "./components/ui-table-column"
 
-const VueUiTablePlugin = {
+const VueUiTable = {
     install(Vue, options) {
         console.debug("install vue-ui-table", options)
         setConfig(options)
@@ -18,8 +18,8 @@ const VueUiTablePlugin = {
 let GlobalVue
 if(typeof window !== "undefined") GlobalVue = window.Vue
 else if(typeof global !== "undefined") GlobalVue = global.Vue
-if(GlobalVue) GlobalVue.use(VueUiTablePlugin)
+if(GlobalVue) GlobalVue.use(VueUiTable)
 
 export { UiTable, UiTableColumn }
 
-export default VueUiTablePlugin
+export default VueUiTable

@@ -12,7 +12,7 @@
     "scripts": {
         "serve": "vue-cli-service serve",
         "build": "vue-cli-service build",
-        "build-lib": "vue-cli-service build --target lib --name vue-ui-table src/vue-ui-template-plugin.js",
+        "build-lib": "vue-cli-service build --target lib --name vue-ui-table src/vue-ui-table.js",
         "publish": "sh ./publish.sh",
         "docs": "sh ./build-docs.sh"
     },
