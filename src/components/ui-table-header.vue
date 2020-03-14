@@ -10,7 +10,7 @@ export default {
         const data = {}
         if(!isNil(this.column.columnWidth)) data.style = { width: this.column.columnWidth }
         const children = [this.column.renderHeader()]
-        return h("th", data, children)
+        return h(this.column.headerTag, data, children)
     }
 }
 </script>

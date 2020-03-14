@@ -12,7 +12,7 @@
         render(h) {
             const data = { class: this.column.getCellClass(this.item) }
             const children = [this.column.renderItem(this.item, this.itemKey)]
-            return h("td", data, children)
+            return h(this.column.cellTag, data, children)
         }
     }
 

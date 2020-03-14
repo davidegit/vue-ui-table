@@ -3,9 +3,14 @@
 .ui-table-container {
 	min-width: 100%;
 	overflow: auto;
+	padding-bottom: 5px;
 	table {
 		width: 100%;
-		&.borderless { &, thead, tbody, tfoot, tr, th, td { border: none; } }
+		&.borderless {
+			&, thead, tbody, tfoot, tr, th, td {
+				border: none !important;
+			}
+		}
 		th, td {
 			&.fit, &[fit] {
 				white-space: nowrap;
@@ -17,6 +22,7 @@
 			border-collapse: collapse;
 			&.striped tr:nth-child(even) { background-color: $stripe-color; }
 			&.bordered {
+				box-shadow: 0 0 0 1px $border-color;
 				th, td {
 					border-top: solid 1px $border-color;
 					border-left: solid 1px $border-color;
@@ -33,6 +39,7 @@
 				border-bottom: solid 2px $border-color;
 				tr {
 					height: 56px;
+					th { vertical-align: middle; }
 				}
 			}
 			tbody td { border-bottom: solid 1px $border-color; }

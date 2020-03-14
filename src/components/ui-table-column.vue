@@ -5,19 +5,24 @@
 <script>
 import { formattersFactory } from "@/mixins/formatters-mixin"
 import pixelHelperMixin from "@/mixins/pixel-helper-mixin"
+import htmlHelperMixin from "@/mixins/html-helper-mixin"
 import * as _ from "lodash"
 
 export default {
     name: "ui-table-column",
-    mixins: [formattersFactory(true, true), pixelHelperMixin],
+    mixins: [formattersFactory(true, true), pixelHelperMixin, htmlHelperMixin],
     props: {
         header: String,
         prop: String,
         sortable: Boolean,
         sortProp: String,
         width: [String, Number],
+        headerTag: { type: String, default: "th" },
         headerClass: [String, Array, Object],
-        cellClass: [String, Array, Object, Function]
+        cellTag: { type: String, default: "td" },
+        cellClass: [String, Array, Object, Function],
+        fit: Boolean,
+        grow: Boolean
     },
     computed: {
         columnId() { return _.uniqueId("ui-table-column-") },
@@ -32,10 +37,8 @@ export default {
     methods: {
         getHeaderClass() { return this.headerClass },
         getCellClass(item) {
-            if(!_.isNil(this.cellClass)) {
-                if(_.isFunction(this.cellClass)) return this.cellClass(item)
-                return this.cellClass
-            }
+            const cellClass = _.isFunction(this.cellClass) ? this.cellClass(item) : this.cellClass
+            return Object.assign(this.convertClassToObject(cellClass), { fit: this.fit, grow: this.grow })
         },
         getValue(item) {
             let value = ""
