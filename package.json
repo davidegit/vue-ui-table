@@ -1,14 +1,12 @@
 {
     "name": "@davidegit/vue-ui-table",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "description": "A flexible table component for Vue.js",
     "author": "Davide Vergine",
     "homepage": "https://davidegit.github.io/vue-ui-table/",
     "private": false,
     "main": "dist/vue-ui-table.common.js",
-    "files": [
-        "dist/*"
-    ],
+    "files": ["dist/*"],
     "scripts": {
         "serve": "vue-cli-service serve",
         "build": "vue-cli-service build",

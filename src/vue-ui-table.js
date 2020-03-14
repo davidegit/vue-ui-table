@@ -1,6 +1,7 @@
 import config, { setConfig } from "./config"
 import UiTable from "./components/ui-table"
 import UiTableColumn from "./components/ui-table-column"
+import "@/assets/scss/ui-table.scss"
 
 const VueUiTable = {
     install(Vue, options) {

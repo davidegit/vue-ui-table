@@ -2,9 +2,8 @@
 
 set -e
 
-#npm run docs
-
 npm run build-lib
+cp -a src/assets/scss dist/scss
 echo 'vue-ui-table buildato'
 
 npm publish --access=public
