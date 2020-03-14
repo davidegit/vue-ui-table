@@ -2,7 +2,7 @@
 
 set -e
 
-npm run docs
+#npm run docs
 
 npm run build-lib
 echo 'vue-ui-table buildato'
