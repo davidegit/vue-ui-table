@@ -3,7 +3,7 @@
     "version": "0.1.2",
     "description": "A flexible table component for Vue.js",
     "author": "Davide Vergine",
-    "homepage": "https://github.com/davidegit/vue-ui-table/index.html",
+    "homepage": "https://davidegit.github.io/vue-ui-table/",
     "private": false,
     "main": "dist/vue-ui-table.common.js",
     "files": [
