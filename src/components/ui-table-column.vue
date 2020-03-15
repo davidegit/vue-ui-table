@@ -48,7 +48,7 @@ export default {
         renderHeader(props) {
             if(!!this.$slots.header) return this.$slots.header
             if(!!this.$scopedSlots.header) return this.$scopedSlots.header(props)
-            return this.header
+            return this.header || this.prop
         },
         renderItem(item, itemKey) {
             const value = this.getValue(item)
