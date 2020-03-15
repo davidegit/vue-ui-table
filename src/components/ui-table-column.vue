@@ -35,7 +35,9 @@ export default {
         columnWidth() { return this.convertToPixel(this.width) }
     },
     methods: {
-        getHeaderClass() { return this.headerClass },
+        getHeaderClass() {
+            return Object.assign(this.convertClassToObject(this.headerClass), { fit: this.fit, grow: this.grow })
+        },
         getCellClass(item) {
             const cellClass = _.isFunction(this.cellClass) ? this.cellClass(item) : this.cellClass
             return Object.assign(this.convertClassToObject(cellClass), { fit: this.fit, grow: this.grow })

@@ -34,6 +34,7 @@
 				th, td { padding: 2px; }
 			}
 			&.hoverable tbody tr:hover { background-color: $hover-color; }
+			&.fixed { table-layout: fixed; }
 			th, td { padding: 8px; }
 			thead {
 				border-bottom: solid 2px $border-color;
@@ -42,7 +43,9 @@
 					th { vertical-align: middle; }
 				}
 			}
-			tbody td { border-bottom: solid 1px $border-color; }
+			tbody {
+				td, th { border-bottom: solid 1px $border-color; }
+			}
 		}
 	}
 }

@@ -8,26 +8,23 @@
                 <slot name="caption">{{caption}}</slot>
             </caption>
             <thead v-if="!hideHeaders">
-            <slot name="headers">
-                <tr>
-                    <ui-table-header v-for="(column, columnIndex) in columns" :key="`ui-table-header-${columnIndex}`" :column="column"/>
-                </tr>
-            </slot>
+                <slot name="headers">
+                    <tr>
+                        <ui-table-header v-for="(column, columnIndex) in columns" :key="`ui-table-header-${columnIndex}`" :column="column"/>
+                    </tr>
+                </slot>
             </thead>
             <tbody>
-            <slot name="items">
-                <template v-for="(row, rowIndex) in rows">
-                    <slot name="row" v-bind="row">
-                        <tr :key="`ui-table-row-${rowIndex}`">
-                            <ui-table-cell v-for="(column, columnIndex) in columns" :key="`ui-table-cell-${rowIndex}-${columnIndex}`" :column="column" v-bind="row"/>
-                        </tr>
-                    </slot>
-                </template>
-            </slot>
+                <slot name="rows" v-bind="{ rows }">
+                    <template v-for="(row, rowIndex) in rows">
+                        <slot name="row" v-bind="row">
+                            <tr :key="`ui-table-row-${rowIndex}`">
+                                <ui-table-cell v-for="(column, columnIndex) in columns" :key="`ui-table-cell-${rowIndex}-${columnIndex}`" :column="column" v-bind="row"/>
+                            </tr>
+                        </slot>
+                    </template>
+                </slot>
             </tbody>
-            <tfoot>
-
-            </tfoot>
         </table>
     </div>
 </template>
@@ -43,18 +40,11 @@
         name: "ui-table",
         mixins: [pixelHelperMixin, htmlHelperMixin],
         components: { UiTableHeader, UiTableCell },
-        model: {
-            prop: "selected",
-            event: "change"
-        },
         props: {
             caption: String,
             hideHeaders: Boolean,
             items: Array,
             itemKey: [String, Function],
-            selected: { required: false },
-            multiple: Boolean,
-            hideFooter: Boolean,
             pagination: [Boolean, Object],
             bordered: Boolean,
             striped: Boolean,
@@ -83,7 +73,6 @@
             pagedItems() { return this.items },
             rows() { return _.map(this.pagedItems, (item, index) => ({ item, itemKey: this.getItemKey(item, index) })) },
             fixedLayout() { return !_.chain(this.columns).find(column => !!column.columnWidth).isNil().value() },
-            selectable() { return !_.isNil(this.$listeners.change) },
             containerClasses() {
                 return {
                     [this.$uiTable.theme.classes.container]: true,
@@ -108,8 +97,9 @@
                     [this.$uiTable.theme.classes.bordered]: this.bordered && !this.borderless,
                     [this.$uiTable.theme.classes.striped]: this.striped,
                     [this.$uiTable.theme.classes.dense]: this.dense,
-                    [this.$uiTable.theme.classes.hoverable]: this.selectable || this.hoverable,
+                    [this.$uiTable.theme.classes.hoverable]: this.hoverable,
                     borderless: this.borderless && !this.bordered,
+                    fixed: this.fixedLayout,
                     ...this.convertClassToObject(this.tableClass)
                 }
             }
