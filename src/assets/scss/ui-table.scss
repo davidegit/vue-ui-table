@@ -1,5 +1,11 @@
 @import "variables";
 
+@mixin xs { @media (max-width: #{$xs - 1px}) { @content; } }
+@mixin sm { @media (min-width: #{$xs}) and (max-width: #{$sm - 1px}) { @content; } }
+@mixin md { @media (min-width: #{$sm}) and (max-width: #{$md - 1px}) { @content; } }
+@mixin lg { @media (min-width: #{$md}) and (max-width: #{$lg - 1px}) { @content; } }
+@mixin xl { @media (min-width: #{$lg}) { @content; } }
+
 .ui-table-container {
 	min-width: 100%;
 	overflow: auto;
@@ -35,7 +41,7 @@
 			}
 			&.hoverable tbody tr:hover { background-color: $hover-color; }
 			&.fixed { table-layout: fixed; }
-			th, td { padding: 8px; }
+			th, td { padding: $cell-padding; }
 			thead {
 				border-bottom: solid 2px $border-color;
 				tr {
@@ -46,6 +52,50 @@
 			tbody {
 				td, th { border-bottom: solid 1px $border-color; }
 			}
+			span.sortable {
+				display: flex;
+				align-items: center;
+				cursor: pointer;
+				.ui-table-sort-icon {
+					margin-right: 0.25rem;
+					-webkit-transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+					transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+				}
+				&.sorted.desc .ui-table-sort-icon {
+					-webkit-transform: rotate(-180deg);
+					transform: rotate(-180deg);
+				}
+				&:not(.sorted) .ui-table-sort-icon { opacity: 0; }
+				&:not(.sorted):hover .ui-table-sort-icon { opacity: 0.5; }
+			}
+		}
+	}
+	.ui-table-pagination {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		@include xs { flex-direction: column-reverse; }
+		.ui-max-select, .ui-page-select {
+			padding: $cell-padding;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+		.ui-select select, button {
+			height: 2em;
+			min-width: 28px;
+			font-size: 12px;
+			margin-top: 5px;
+			border-radius: 4px;
+			border: solid 1px $border-color;
+			background-color: $pagination-control-color;
+		}
+		.ui-select select {
+			margin-left: $cell-padding;
+			min-width: 42px;
+		}
+		.ui-page-select {
+			min-width: 240px;
 		}
 	}
 }

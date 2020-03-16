@@ -32,15 +32,18 @@ export default {
             return parent
         },
         sortOn() { return this.sortProp || this.prop },
-        columnWidth() { return this.convertToPixel(this.width) }
+        columnWidth() { return this.convertToPixel(this.width) },
+        hasCustomHeader() { return !_.isNil(this.$scopedSlots.header) }
     },
     methods: {
         getHeaderClass() {
-            return Object.assign(this.convertClassToObject(this.headerClass), { fit: this.fit, grow: this.grow })
+            const extra = this.uiTable.isFixedLayout ? {} : { fit: this.fit, grow: this.grow }
+            return Object.assign(this.convertClassToObject(this.headerClass), extra)
         },
         getCellClass(item) {
             const cellClass = _.isFunction(this.cellClass) ? this.cellClass(item) : this.cellClass
-            return Object.assign(this.convertClassToObject(cellClass), { fit: this.fit, grow: this.grow })
+            const extra = this.uiTable.isFixedLayout ? {} : { fit: this.fit, grow: this.grow }
+            return Object.assign(this.convertClassToObject(cellClass), extra)
         },
         getValue(item) {
             let value = ""

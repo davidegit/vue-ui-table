@@ -10,7 +10,9 @@
             <thead v-if="!hideHeaders">
                 <slot name="headers">
                     <tr>
-                        <ui-table-header v-for="(column, columnIndex) in columns" :key="`ui-table-header-${columnIndex}`" :column="column"/>
+                        <ui-table-header v-for="(column, columnIndex) in columns" :key="`ui-table-header-${columnIndex}`"
+                                         :column="column" :sort.sync="sort" :sort-disabled="sortDisabled"
+                                         :fixed-layout="isFixedLayout"/>
                     </tr>
                 </slot>
             </thead>
@@ -25,27 +27,41 @@
                     </template>
                 </slot>
             </tbody>
+            <tfoot v-if="hasFooter">
+                <slot name="footer">
+                    <tr>
+                        <td :colspan="columns.length">{{footer}}</td>
+                    </tr>
+                </slot>
+            </tfoot>
         </table>
+        <slot name="pagination" v-if="paginationEnabled">
+            <ui-table-pagination :max.sync="max" :page.sync="page" :total-items="totalItems"/>
+        </slot>
     </div>
 </template>
 
 <script>
     import pixelHelperMixin from "@/mixins/pixel-helper-mixin"
     import htmlHelperMixin from "@/mixins/html-helper-mixin"
-    import * as _ from "lodash"
     import UiTableHeader from "./ui-table-header"
     import UiTableCell from "./ui-table-cell"
+    import UiTablePagination from "./ui-table-pagination"
+    import * as _ from "lodash"
 
     export default {
         name: "ui-table",
         mixins: [pixelHelperMixin, htmlHelperMixin],
-        components: { UiTableHeader, UiTableCell },
+        components: { UiTableHeader, UiTableCell, UiTablePagination },
         props: {
             caption: String,
+            footer: String,
             hideHeaders: Boolean,
             items: Array,
             itemKey: [String, Function],
+            multisort: Boolean,
             pagination: [Boolean, Object],
+            hidePagination: Boolean,
             bordered: Boolean,
             striped: Boolean,
             dense: Boolean,
@@ -56,23 +72,78 @@
             height: [String, Number],
             maxHeight: [String, Number],
             containerClass: [String, Array, Object],
-            tableClass: [String, Array, Object]
+            tableClass: [String, Array, Object],
+            fixedLayout: Boolean,
+            sortDisabled: Boolean
         },
         data() {
             return {
-                columns: []
+                columns: [],
+                pageable: {
+                    lastSort: {},
+                    sort: {},
+                    max: 20,
+                    page: 1
+                }
             }
         },
         computed: {
             tableId() { return _.uniqueId("ui-table-") },
             hasCaption() { return !_.isNil(this.caption) || !_.isNil(this.$slots.caption) },
+            hasFooter() { return !_.isNil(this.footer) || !_.isNil(this.$slots.footer) },
+            sortingEnabled() { return !this.sortDisabled && !_.chain(this.columns).find(column => column.sortable).isNil().value() },
+            reactivePagination() { return _.isPlainObject(this.pagination) && !_.isEmpty(this.pagination) },
             paginationEnabled() {
-                if(_.isBoolean(this.pagination)) return !this.hideFooter && this.pagination
-                else return !this.hideFooter && !_.isEmpty(this.pagination)
+                if(_.isBoolean(this.pagination)) return this.pagination
+                else return this.reactivePagination
             },
-            pagedItems() { return this.items },
-            rows() { return _.map(this.pagedItems, (item, index) => ({ item, itemKey: this.getItemKey(item, index) })) },
-            fixedLayout() { return !_.chain(this.columns).find(column => !!column.columnWidth).isNil().value() },
+            sort: {
+                get() {
+                    if(this.reactivePagination) return _.get(this.pagination, "sort", {})
+                    const sort = _.get(this.pageable, "sort", {})
+                    if(!this.multisort && _.keys(sort).length > 1) return this.pageable.lastSort
+                    return sort
+                },
+                set(sort) {
+                    if(sort.order === this.$uiTable.pagination.sort.noOrder) this.pageable.lastSort = {}
+                    this.pageable.lastSort = { [sort.prop]: sort.order }
+                    if(this.multisort) {
+                        const actual = Object.assign({}, this.sort)
+                        if(sort.order === this.$uiTable.pagination.sort.noOrder) {
+                            delete actual[sort.prop]
+                            this.pageable.sort = actual
+                        } else this.pageable.sort = Object.assign(actual, this.pageable.lastSort)
+                    } else this.pageable.sort = this.pageable.lastSort
+                    this.updatePagination()
+                }
+            },
+            max: {
+                get() { return this.pageable.max },
+                set(max) { this.pageable.max = max }
+            },
+            page: {
+                get() { return this.pageable.page },
+                set(page) { this.pageable.page = page }
+            },
+            pagedAndSortedItems() {
+                let pipeline = _.chain(this.items)
+                if(this.sortingEnabled) {
+                    const props = _.keys(this.sort)
+                    const orders = _.chain(this.sort).values().map(order => order === this.$uiTable.pagination.sort.asc ? "asc" : "desc").value()
+                    console.debug("ui-table sort on", props, orders)
+                    pipeline = pipeline.orderBy(props, orders)
+                }
+                if(this.paginationEnabled) {
+                    const start = this.max * (this.page - 1)
+                    const end = start + this.max
+                    console.debug("ui-table slice rows", start, end)
+                    pipeline = pipeline.slice(start, end)
+                }
+                return pipeline.value()
+            },
+            rows() { return _.map(this.pagedAndSortedItems, (item, index) => ({ item, itemKey: this.getItemKey(item, index) })) },
+            totalItems() { return this.items.length },
+            isFixedLayout() { return this.fixedLayout || !_.chain(this.columns).find(column => !!column.columnWidth).isNil().value() },
             containerClasses() {
                 return {
                     [this.$uiTable.theme.classes.container]: true,
@@ -99,7 +170,7 @@
                     [this.$uiTable.theme.classes.dense]: this.dense,
                     [this.$uiTable.theme.classes.hoverable]: this.hoverable,
                     borderless: this.borderless && !this.bordered,
-                    fixed: this.fixedLayout,
+                    fixed: this.isFixedLayout,
                     ...this.convertClassToObject(this.tableClass)
                 }
             }
@@ -123,6 +194,9 @@
                     console.debug("ui-table remove column", column.columnId, "at index", index)
                     this.columns.splice(index, 1)
                 }
+            },
+            updatePagination() {
+                if(this.reactivePagination) this.$emit("update:pagination", this.pageable)
             }
         }
     }
