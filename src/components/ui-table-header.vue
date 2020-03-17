@@ -1,5 +1,7 @@
 <script>
-import { isNil, get, has } from "lodash"
+import isNil from "lodash/isNil"
+import get from "lodash/get"
+import has from "lodash/has"
 import UiIcon from "./ui-icon"
 
 export default {

@@ -1,4 +1,6 @@
-import { isNil, isString, isNumber, endsWith } from "lodash"
+import isNil from "lodash/isNil"
+import isNumber from "lodash/isNumber"
+import isString from "lodash/isString"
 
 export default {
     methods: {

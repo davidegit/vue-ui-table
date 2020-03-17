@@ -54,7 +54,25 @@
     import UiTableCell from "./ui-table-cell"
     import UiTablePagination from "./ui-table-pagination"
     import UiTableLoading from "./ui-table-loading"
-    import * as _ from "lodash"
+    import uniqueId from "lodash/uniqueId"
+    import isBoolean from "lodash/isBoolean"
+    import keys from "lodash/keys"
+    import map from "lodash/map"
+    import isNil from "lodash/isNil"
+    import set from "lodash/set"
+    import isString from "lodash/isString"
+    import isPlainObject from "lodash/isPlainObject"
+    import get from "lodash/get"
+    import isFunction from "lodash/isFunction"
+    import isEqual from "lodash/isEqual"
+    import isEmpty from "lodash/isEmpty"
+    import { chain, pipeline } from "@/utils/lodash-helper"
+    import fpMap from "lodash/fp/map"
+    import fpValues from "lodash/fp/values"
+    import fpOrderBy from "lodash/fp/orderBy"
+    import fpFind from "lodash/fp/find"
+    import fpIsNil from "lodash/fp/isNil"
+    import fpSlice from "lodash/fp/slice"
 
     export default {
         name: "ui-table",
@@ -100,27 +118,27 @@
             }
         },
         computed: {
-            tableId() { return _.uniqueId("ui-table-") },
-            hasCaption() { return !_.isNil(this.caption) || !_.isNil(this.$slots.caption) },
-            hasFooter() { return !_.isNil(this.footer) || !_.isNil(this.$slots.footer) },
-            sortingEnabled() { return !this.sortDisabled && !_.chain(this.columns).find(column => column.sortable).isNil().value() },
-            reactivePagination() { return _.isPlainObject(this.pagination) && !_.isEmpty(this.pagination) },
+            tableId() { return uniqueId("ui-table-") },
+            hasCaption() { return !isNil(this.caption) || !isNil(this.$slots.caption) },
+            hasFooter() { return !isNil(this.footer) || !isNil(this.$slots.footer) },
+            sortingEnabled() { return !this.sortDisabled && !chain(this.columns, fpFind(column => column.sortable), fpIsNil) },
+            reactivePagination() { return isPlainObject(this.pagination) && !isEmpty(this.pagination) },
             paginationEnabled() {
-                if(_.isBoolean(this.pagination)) return this.pagination
+                if(isBoolean(this.pagination)) return this.pagination
                 else return this.reactivePagination
             },
             firstPage() { return this.$uiTable.pagination.page.default },
             lastPage() { return Math.ceil(this.totalItems / Math.abs(this.max)) },
             sort: {
                 get() {
-                    if(this.reactivePagination) return _.get(this.pagination, "sort", {})
-                    const sort = _.get(this.pageable, "sort", {})
-                    if(!this.multisort && _.keys(sort).length > 1) return this.pageable.lastSort
+                    if(this.reactivePagination) return get(this.pagination, "sort", {})
+                    const sort = get(this.pageable, "sort", {})
+                    if(!this.multisort && keys(sort).length > 1) return this.pageable.lastSort
                     return sort
                 },
                 set(sort) {
                     if(sort.order === this.$uiTable.pagination.sort.noOrder) this.pageable.lastSort = {}
-                    this.pageable.lastSort = { [sort.prop]: sort.order }
+                    else this.pageable.lastSort = { [sort.prop]: sort.order }
                     if(this.multisort) {
                         const actual = Object.assign({}, this.sort)
                         if(sort.order === this.$uiTable.pagination.sort.noOrder) {
@@ -153,24 +171,24 @@
                 }
             },
             pagedAndSortedItems() {
-                let pipeline = _.chain(this.items)
+                const pageAndSort = pipeline(this.items)
                 if(this.sortingEnabled) {
-                    const props = _.keys(this.sort)
-                    const orders = _.chain(this.sort).values().map(order => order === this.$uiTable.pagination.sort.asc ? "asc" : "desc").value()
+                    const props = keys(this.sort)
+                    const orders = chain(this.sort, fpValues, fpMap(order => order === this.$uiTable.pagination.sort.asc ? "asc" : "desc"))
                     console.debug("ui-table sort on", props, orders)
-                    pipeline = pipeline.orderBy(props, orders)
+                    pageAndSort.pipe(fpOrderBy(props, orders))
                 }
                 if(this.paginationEnabled) {
                     const start = this.max * (this.page - 1)
                     const end = start + this.max
                     console.debug("ui-table slice rows", start, end)
-                    pipeline = pipeline.slice(start, end)
+                    pageAndSort.pipe(fpSlice(start, end))
                 }
-                return pipeline.value()
+                return pageAndSort.run()
             },
-            rows() { return _.map(this.pagedAndSortedItems, (item, index) => ({ item, itemKey: this.getItemKey(item, index), class: this.getRowClass(item), style: this.getRowStyle(item) })) },
+            rows() { return map(this.pagedAndSortedItems, (item, index) => ({ item, itemKey: this.getItemKey(item, index), class: this.getRowClass(item), style: this.getRowStyle(item) })) },
             totalItems() { return this.items.length },
-            isFixedLayout() { return this.fixedLayout || !_.chain(this.columns).find(column => !!column.columnWidth).isNil().value() },
+            isFixedLayout() { return this.fixedLayout || !chain(this.columns, fpFind(column => !!column.columnWidth), fpIsNil) },
             isLoading() { return this.loading },
             containerClasses() {
                 return {
@@ -185,10 +203,10 @@
                 const maxWidth = this.convertToPixel(this.maxWidth)
                 const maxHeight = this.convertToPixel(this.maxHeight)
                 const style = {}
-                if(!_.isNil(width)) _.set(style, "width", width)
-                if(!_.isNil(height)) _.set(style, "height", height)
-                if(!_.isNil(maxWidth)) _.set(style, "maxWidth", maxWidth)
-                if(!_.isNil(maxHeight)) _.set(style, "maxHeight", maxHeight)
+                if(!isNil(width)) set(style, "width", width)
+                if(!isNil(height)) set(style, "height", height)
+                if(!isNil(maxWidth)) set(style, "maxWidth", maxWidth)
+                if(!isNil(maxHeight)) set(style, "maxHeight", maxHeight)
                 return style
             },
             tableclasses() {
@@ -207,8 +225,8 @@
         },
         methods: {
             getItemKey(item, index) {
-                if(_.isString(this.itemKey) && _.isPlainObject(item)) return _.get(item, this.itemKey)
-                if(_.isFunction(this.itemKey)) return this.itemKey(item)
+                if(isString(this.itemKey) && isPlainObject(item)) return get(item, this.itemKey)
+                if(isFunction(this.itemKey)) return this.itemKey(item)
                 return index
             },
             getColumnIndex(column) { return [].indexOf.call(this.$refs.columns.children, column.$el) },
@@ -226,11 +244,11 @@
                 }
             },
             getRowClass(item) {
-                const rowClass = _.isFunction(this.rowClass) ? this.rowClass(item) : this.rowClass
+                const rowClass = isFunction(this.rowClass) ? this.rowClass(item) : this.rowClass
                 return this.convertClassToObject(rowClass)
             },
             getRowStyle(item) {
-                const rowStyle = _.isFunction(this.rowStyle) ? this.rowStyle(item) : this.rowStyle
+                const rowStyle = isFunction(this.rowStyle) ? this.rowStyle(item) : this.rowStyle
                 return this.convertStyleToObject(rowStyle)
             },
             fixPage() {
@@ -251,7 +269,7 @@
                 }
             },
             setPagination(pagination) {
-                if(_.isPlainObject(pagination)) {
+                if(isPlainObject(pagination)) {
                     console.debug("ui-table set pagination", pagination)
                     const { sort, max, page } = pagination
                     if(page !== this.page) this.pageable.page = page
@@ -259,7 +277,7 @@
                         this.pageable.max = max
                         if(this.fixPage()) this.updatePagination()
                     }
-                    if(!_.isEqual(sort, this.sort)) this.pageable.sort = sort
+                    if(!isEqual(sort, this.sort)) this.pageable.sort = sort
                 }
             }
         },

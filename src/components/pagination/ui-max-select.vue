@@ -4,7 +4,7 @@
 
 <script>
 	import UiSelect from "@/components/ui-select"
-	import { uniqueId } from "lodash"
+	import uniqueId from "lodash/uniqueId"
 
     export default {
         name: "ui-max-select",

@@ -1,4 +1,5 @@
-import { isString, isPlainObject } from "lodash"
+import isString from "lodash/isString"
+import isPlainObject from "lodash/isPlainObject"
 
 export default {
     methods: {

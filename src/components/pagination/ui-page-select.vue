@@ -1,7 +1,8 @@
 <script>
     import UiSelect from "@/components/ui-select"
     import UiIcon from "@/components/ui-icon"
-	import { head, last } from "lodash"
+	import head from "lodash/head"
+	import last from "lodash/last"
 
     export default {
         name: "ui-page-select",

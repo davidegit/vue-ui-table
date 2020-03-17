@@ -1,5 +1,7 @@
 <script>
-    import { includes, sortBy, times} from "lodash"
+	import includes from "lodash/includes"
+	import sortBy from "lodash/sortBy"
+	import times from "lodash/times"
 	import UiMaxSelect from "./pagination/ui-max-select"
 	import UiPageSelect from "./pagination/ui-page-select"
 

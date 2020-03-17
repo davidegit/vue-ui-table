@@ -1,6 +1,7 @@
 <script>
 	import UiTable from "./ui-table"
-    import {default as _, isString} from "lodash"
+    import isString from "lodash/isString"
+    import get from "lodash/get"
 	import axios from "axios"
 
     export default {
@@ -44,11 +45,11 @@
 					this.remoteLoading = true
 				    const response = await axios.request(this.fetchConfig)
 					const parsed = this.parseRemoteResponse(response)
-					this.remoteItems = _.get(parsed, "items", [])
-					this.remoteTotals = _.get(parsed, "totalItems", 0)
-                    const page = _.get(parsed, "page", this.page)
-                    const max = _.get(parsed, "max", this.max)
-                    const sort = _.get(parsed, "sort", this.sort)
+					this.remoteItems = get(parsed, "items", [])
+					this.remoteTotals = get(parsed, "totalItems", 0)
+                    const page = get(parsed, "page", this.page)
+                    const max = get(parsed, "max", this.max)
+                    const sort = get(parsed, "sort", this.sort)
 					this.setPagination({ page, max, sort })
 				} catch(e) { this.onError && this.onError(e) }
 				finally { this.remoteLoading = false }

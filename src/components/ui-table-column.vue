@@ -6,7 +6,11 @@
 import { formattersFactory } from "@/mixins/formatters-mixin"
 import pixelHelperMixin from "@/mixins/pixel-helper-mixin"
 import htmlHelperMixin from "@/mixins/html-helper-mixin"
-import * as _ from "lodash"
+import uniqueId from "lodash/uniqueId"
+import isNil from "lodash/isNil"
+import isFunction from "lodash/isFunction"
+import isPlainObject from "lodash/isPlainObject"
+import get from "lodash/get"
 
 export default {
     name: "ui-table-column",
@@ -25,7 +29,7 @@ export default {
         grow: Boolean
     },
     computed: {
-        columnId() { return _.uniqueId("ui-table-column-") },
+        columnId() { return uniqueId("ui-table-column-") },
         uiTable() {
             let parent = this.$parent
             while (parent && !parent.tableId) parent = parent.$parent
@@ -33,7 +37,7 @@ export default {
         },
         sortOn() { return this.sortProp || this.prop },
         columnWidth() { return this.convertToPixel(this.width) },
-        hasCustomHeader() { return !_.isNil(this.$scopedSlots.header) }
+        hasCustomHeader() { return !isNil(this.$scopedSlots.header) }
     },
     methods: {
         getHeaderClass() {
@@ -41,13 +45,13 @@ export default {
             return Object.assign(this.convertClassToObject(this.headerClass), extra)
         },
         getCellClass(item) {
-            const cellClass = _.isFunction(this.cellClass) ? this.cellClass(item) : this.cellClass
+            const cellClass = isFunction(this.cellClass) ? this.cellClass(item) : this.cellClass
             const extra = this.uiTable.isFixedLayout ? {} : { fit: this.fit, grow: this.grow }
             return Object.assign(this.convertClassToObject(cellClass), extra)
         },
         getValue(item) {
             let value = ""
-            if(!_.isNil(this.prop) && _.isPlainObject(item)) value = _.get(item, this.prop)
+            if(!isNil(this.prop) && isPlainObject(item)) value = get(item, this.prop)
             return this.formatValue(value)
         },
         renderHeader(props) {

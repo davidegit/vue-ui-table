@@ -1,5 +1,9 @@
 import Vue from "vue"
-import * as _ from "lodash"
+import get from "lodash/get"
+import isNil from "lodash/isNil"
+import isPlainObject from "lodash/isPlainObject"
+import isEmpty from "lodash/isEmpty"
+import merge from "lodash/merge"
 
 const DEFAULT_MAX = 20
 const DEFAULT_PAGE = 1
@@ -64,11 +68,11 @@ const config = {
         remote: {
             getPaginationParams({ sort, max, page }) { return { params: { max, page, sort }} },
             parseResponse(response) {
-                const items = _.get(response.data, "items", [])
-                const totalItems = _.get(response.data, "totalItems", 0)
-                const page = _.get(response.data, "page", DEFAULT_PAGE)
-                const max = _.get(response.data, "max", DEFAULT_MAX)
-                const sort = _.get(response.data, "sort", DEFAULT_SORT)
+                const items = get(response.data, "items", [])
+                const totalItems = get(response.data, "totalItems", 0)
+                const page = get(response.data, "page", DEFAULT_PAGE)
+                const max = get(response.data, "max", DEFAULT_MAX)
+                const sort = get(response.data, "sort", DEFAULT_SORT)
                 return { items, totalItems, page, max, sort }
             }
         }
@@ -77,15 +81,15 @@ const config = {
 }
 
 export function setConfig(options) {
-    if(!_.isNil(options) && _.isPlainObject(options) && !_.isEmpty(options)) {
-        if(!_.isNil(options.theme) && _.isPlainObject(options.theme)) config.theme = _.merge({}, config.theme, options.theme)
-        if(!_.isNil(options.pagination) && _.isPlainObject(options.pagination)) config.pagination = _.merge({}, config.pagination, options.pagination)
+    if(!isNil(options) && isPlainObject(options) && !isEmpty(options)) {
+        if(!isNil(options.theme) && isPlainObject(options.theme)) config.theme = merge({}, config.theme, options.theme)
+        if(!isNil(options.pagination) && isPlainObject(options.pagination)) config.pagination = merge({}, config.pagination, options.pagination)
         console.debug("vue-ui-table config updated", config)
     }
 }
 
 export function getIcon(icon) { return getConfigValue(`theme.icons.${icon}`, icon) }
 
-export function getConfigValue(key, fallback) { return _.get(config, key, fallback) }
+export function getConfigValue(key, fallback) { return get(config, key, fallback) }
 
 export default Vue.observable(config)

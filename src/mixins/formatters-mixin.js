@@ -1,4 +1,4 @@
-import { isNil } from "lodash"
+import isNil from "lodash/isNil"
 import i18nFormatter from "./formatters/i18n-formatter"
 import functionFormatter from "./formatters/function-formatter"
 import remoteFormatter from "./formatters/remote-formatter"

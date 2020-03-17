@@ -8,7 +8,7 @@
 </template>
 
 <script>
-	import { uniqueId } from "lodash"
+    import uniqueId from "lodash/uniqueId"
 
     export default {
         name: "ui-select",
