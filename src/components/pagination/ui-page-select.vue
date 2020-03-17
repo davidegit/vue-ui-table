@@ -1,7 +1,7 @@
 <script>
     import UiSelect from "@/components/ui-select"
     import UiIcon from "@/components/ui-icon"
-	import { maxBy, isUndefined, head } from "lodash"
+	import { head, last } from "lodash"
 
     export default {
         name: "ui-page-select",
@@ -17,11 +17,7 @@
 				set(page) { this.$emit("input", page) }
 			},
 			firstPage() { return head(this.items) },
-			lastPage() {
-                const paxPage = maxBy(this.items)
-                if(isUndefined(paxPage)) return this.firstPage
-                else return paxPage
-			},
+			lastPage() { return last(this.items) || this.firstPage },
             prevDisabled() { return this.page === this.firstPage },
             nextDisabled() { return this.page === this.lastPage }
 		},

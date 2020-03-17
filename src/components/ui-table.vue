@@ -20,11 +20,16 @@
                 <slot name="rows" v-bind="{ rows }">
                     <template v-for="(row, rowIndex) in rows">
                         <slot name="row" v-bind="row">
-                            <tr :key="`ui-table-row-${rowIndex}`">
+                            <tr :key="`ui-table-row-${rowIndex}`" :class="row.class" :style="row.style">
                                 <ui-table-cell v-for="(column, columnIndex) in columns" :key="`ui-table-cell-${rowIndex}-${columnIndex}`" :column="column" v-bind="row"/>
                             </tr>
                         </slot>
                     </template>
+                </slot>
+                <slot name="noItems" v-if="rows.length === 0">
+                    <tr>
+                        <td :colspan="columns.length" class="ui-table-cell-no-items">{{emptyMessage}}</td>
+                    </tr>
                 </slot>
             </tbody>
             <tfoot v-if="hasFooter">
@@ -35,9 +40,10 @@
                 </slot>
             </tfoot>
         </table>
-        <slot name="pagination" v-if="paginationEnabled">
+        <slot name="pagination" v-if="paginationEnabled && !hidePagination">
             <ui-table-pagination :max.sync="max" :page.sync="page" :total-items="totalItems"/>
         </slot>
+        <ui-table-loading v-if="isLoading" :type="loadingType"/>
     </div>
 </template>
 
@@ -47,12 +53,13 @@
     import UiTableHeader from "./ui-table-header"
     import UiTableCell from "./ui-table-cell"
     import UiTablePagination from "./ui-table-pagination"
+    import UiTableLoading from "./ui-table-loading"
     import * as _ from "lodash"
 
     export default {
         name: "ui-table",
         mixins: [pixelHelperMixin, htmlHelperMixin],
-        components: { UiTableHeader, UiTableCell, UiTablePagination },
+        components: {UiTableLoading, UiTableHeader, UiTableCell, UiTablePagination },
         props: {
             caption: String,
             footer: String,
@@ -74,7 +81,12 @@
             containerClass: [String, Array, Object],
             tableClass: [String, Array, Object],
             fixedLayout: Boolean,
-            sortDisabled: Boolean
+            sortDisabled: Boolean,
+            noItemsMessage: String,
+            rowClass: [String, Array, Object, Function],
+            rowStyle: [String, Array, Object, Function],
+            loading: Boolean,
+            loadingType: { type: String, validator: value => ["spinner", "dots", "bars"].indexOf(value) !== -1 }
         },
         data() {
             return {
@@ -97,6 +109,8 @@
                 if(_.isBoolean(this.pagination)) return this.pagination
                 else return this.reactivePagination
             },
+            firstPage() { return this.$uiTable.pagination.page.default },
+            lastPage() { return Math.ceil(this.totalItems / Math.abs(this.max)) },
             sort: {
                 get() {
                     if(this.reactivePagination) return _.get(this.pagination, "sort", {})
@@ -119,11 +133,24 @@
             },
             max: {
                 get() { return this.pageable.max },
-                set(max) { this.pageable.max = max }
+                set(max) {
+                    if(max !== this.max) {
+                        this.pageable.max = max
+                        this.fixPage()
+                        this.updatePagination()
+                    }
+                }
             },
             page: {
                 get() { return this.pageable.page },
-                set(page) { this.pageable.page = page }
+                set(page) {
+                    if(page !== this.page) {
+                        if(page > this.lastPage) this.pageable.page = this.lastPage
+                        else if(page < this.firstPage) this.pageable.page = this.firstPage
+                        else this.pageable.page = page
+                        this.updatePagination()
+                    }
+                }
             },
             pagedAndSortedItems() {
                 let pipeline = _.chain(this.items)
@@ -141,12 +168,14 @@
                 }
                 return pipeline.value()
             },
-            rows() { return _.map(this.pagedAndSortedItems, (item, index) => ({ item, itemKey: this.getItemKey(item, index) })) },
+            rows() { return _.map(this.pagedAndSortedItems, (item, index) => ({ item, itemKey: this.getItemKey(item, index), class: this.getRowClass(item), style: this.getRowStyle(item) })) },
             totalItems() { return this.items.length },
             isFixedLayout() { return this.fixedLayout || !_.chain(this.columns).find(column => !!column.columnWidth).isNil().value() },
+            isLoading() { return this.loading },
             containerClasses() {
                 return {
                     [this.$uiTable.theme.classes.container]: true,
+                    loading: this.isLoading,
                     ...this.convertClassToObject(this.containerClass)
                 }
             },
@@ -173,7 +202,8 @@
                     fixed: this.isFixedLayout,
                     ...this.convertClassToObject(this.tableClass)
                 }
-            }
+            },
+            emptyMessage() { return this.noItemsMessage || this.$uiTable.emptyMessage }
         },
         methods: {
             getItemKey(item, index) {
@@ -195,9 +225,46 @@
                     this.columns.splice(index, 1)
                 }
             },
+            getRowClass(item) {
+                const rowClass = _.isFunction(this.rowClass) ? this.rowClass(item) : this.rowClass
+                return this.convertClassToObject(rowClass)
+            },
+            getRowStyle(item) {
+                const rowStyle = _.isFunction(this.rowStyle) ? this.rowStyle(item) : this.rowStyle
+                return this.convertStyleToObject(rowStyle)
+            },
+            fixPage() {
+                if(this.page > this.lastPage) {
+                    this.pageable.page = this.lastPage
+                    return true
+                } else if(this.page < this.firstPage) {
+                    this.pageable.page = this.firstPage
+                    return true
+                }
+                return false
+            },
             updatePagination() {
-                if(this.reactivePagination) this.$emit("update:pagination", this.pageable)
+                const { sort, max, page } = this.pageable
+                if(this.reactivePagination) {
+                    console.debug("ui-table update pagination", max, page, sort)
+                    this.$nextTick(() => this.$emit("update:pagination", { sort, max, page }))
+                }
+            },
+            setPagination(pagination) {
+                if(_.isPlainObject(pagination)) {
+                    console.debug("ui-table set pagination", pagination)
+                    const { sort, max, page } = pagination
+                    if(page !== this.page) this.pageable.page = page
+                    if(max !== this.max) {
+                        this.pageable.max = max
+                        if(this.fixPage()) this.updatePagination()
+                    }
+                    if(!_.isEqual(sort, this.sort)) this.pageable.sort = sort
+                }
             }
+        },
+        watch: {
+            pagination: { handler: "setPagination", immediate: true, deep: true }
         }
     }
 </script>

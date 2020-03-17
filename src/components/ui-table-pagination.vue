@@ -1,5 +1,5 @@
 <script>
-	import { includes, sortBy, times } from "lodash"
+    import { includes, sortBy, times} from "lodash"
 	import UiMaxSelect from "./pagination/ui-max-select"
 	import UiPageSelect from "./pagination/ui-page-select"
 
@@ -18,9 +18,9 @@
                 return sortBy(maxes)
             },
             pages() {
-                if(this.totalItems < this.max) return [1]
+                if(this.totalItems < this.max) return [this.$uiTable.pagination.page.default]
                 else return times(Math.ceil(this.totalItems / Math.abs(this.max)), n => n + 1)
-            },
+            }
 		},
 		methods: {
             updateMax(max) { this.$emit("update:max", max) },

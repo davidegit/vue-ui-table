@@ -10,6 +10,7 @@
 	min-width: 100%;
 	overflow: auto;
 	padding-bottom: 5px;
+	position: relative;
 	table {
 		width: 100%;
 		&.borderless {
@@ -89,6 +90,7 @@
 			border-radius: 4px;
 			border: solid 1px $border-color;
 			background-color: $pagination-control-color;
+			&:disabled, &[disabled] { cursor: not-allowed; }
 		}
 		.ui-select select {
 			margin-left: $cell-padding;
@@ -97,5 +99,22 @@
 		.ui-page-select {
 			min-width: 240px;
 		}
+	}
+	&.loading {
+		table, .ui-table-pagination {
+			-webkit-filter: blur(2px);
+			filter: blur(2px);
+		}
+	}
+	.ui-table-loading {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background-color: $loading-overlay;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 }
