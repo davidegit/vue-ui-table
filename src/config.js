@@ -86,6 +86,8 @@ export function setConfig(options) {
     if(!isNil(options) && isPlainObject(options) && !isEmpty(options)) {
         if(!isNil(options.theme) && isPlainObject(options.theme)) config.theme = merge({}, config.theme, options.theme)
         if(!isNil(options.pagination) && isPlainObject(options.pagination)) config.pagination = merge({}, config.pagination, options.pagination)
+        if(!isNil(options.emptyMessage)) config.emptyMessage = options.emptyMessage
+        if(!isNil(options.axios)) config.axios = options.axios
         console.debug("vue-ui-table config updated", config)
     }
 }
