@@ -4,6 +4,7 @@ import isNil from "lodash/isNil"
 import isPlainObject from "lodash/isPlainObject"
 import isEmpty from "lodash/isEmpty"
 import merge from "lodash/merge"
+import axios from "axios"
 
 const DEFAULT_MAX = 20
 const DEFAULT_PAGE = 1
@@ -77,7 +78,8 @@ const config = {
             }
         }
     },
-    emptyMessage: "No items found"
+    emptyMessage: "No items found",
+    axios
 }
 
 export function setConfig(options) {

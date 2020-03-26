@@ -77,7 +77,7 @@
     export default {
         name: "ui-table",
         mixins: [pixelHelperMixin, htmlHelperMixin],
-        components: {UiTableLoading, UiTableHeader, UiTableCell, UiTablePagination },
+        components: { UiTableLoading, UiTableHeader, UiTableCell, UiTablePagination },
         props: {
             caption: String,
             footer: String,

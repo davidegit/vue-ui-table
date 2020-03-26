@@ -2,7 +2,6 @@
 	import UiTable from "./ui-table"
     import isString from "lodash/isString"
     import get from "lodash/get"
-	import axios from "axios"
 
     export default {
         name: "ui-remote-table",
@@ -43,7 +42,7 @@
 				try {
 				    console.debug("ui-remote-table fetch items", this.fetchConfig)
 					this.remoteLoading = true
-				    const response = await axios.request(this.fetchConfig)
+				    const response = await this.$uiTable.axios.request(this.fetchConfig)
 					const parsed = this.parseRemoteResponse(response)
 					this.remoteItems = get(parsed, "items", [])
 					this.remoteTotals = get(parsed, "totalItems", 0)
