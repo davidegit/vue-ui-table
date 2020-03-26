@@ -31,7 +31,6 @@
     "license": "GPL-3.0-or-later",
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.12.1",
-        "axios": "^0.19.2",
         "lodash": "^4.17.15"
     },
     "devDependencies": {
@@ -53,6 +52,7 @@
         "vue-i18n": "^8.0.0"
     },
     "peerDependencies": {
-        "vue": "^2.5.0"
+        "vue": "^2.5.0",
+        "axios": "^0.18.0"
     }
 }
