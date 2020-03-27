@@ -1,18 +1,26 @@
 {
     "name": "@davidegit/vue-ui-table",
-    "version": "0.2.5",
+    "version": "0.2.6",
     "description": "A flexible table component for Vue.js",
     "author": "Davide Vergine",
     "homepage": "https://davidegit.github.io/vue-ui-table/",
     "private": false,
     "main": "dist/vue-ui-table.common.js",
     "files": [
-        "dist/*"
+        "dist/vue-ui-table.umd.min.js",
+        "dist/vue-ui-table.css",
+        "src/assets/scss/ui-table.scss",
+        "src/assets/scss/variables.scss",
+        "src/components/*",
+        "src/mixins/*",
+        "src/utils/*",
+        "src/config.js",
+        "src/vue-ui-table.js"
     ],
     "scripts": {
         "serve": "vue-cli-service serve",
         "build": "vue-cli-service build --dest docs/",
-        "build-lib": "vue-cli-service build --target lib --name vue-ui-table src/vue-ui-table.js && cp -a src/assets/scss dist/scss && rm -rf dist/demo.html dist/scss/docs.scss",
+        "build-lib": "vue-cli-service build --target lib --name vue-ui-table src/vue-ui-table.js && rm -rf dist/demo.html",
         "npm-publish": "sh ./publish.sh",
         "docs": "sh ./build-docs.sh"
     },
