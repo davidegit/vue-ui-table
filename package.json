@@ -45,7 +45,7 @@
         "@babel/polyfill": "^7.4.4",
         "@vue/cli-plugin-babel": "~4.2.0",
         "@vue/cli-plugin-router": "~4.2.0",
-        "@vue/cli-service": "~4.2.0",
+        "@vue/cli-service": "~5.0.8",
         "bulma": "^0.8.0",
         "bulma-extensions": "^6.2.7",
         "sass": "^1.25.0",
